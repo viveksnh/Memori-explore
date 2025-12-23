@@ -52,7 +52,7 @@ class Api:
                 json=payload,
                 timeout=aiohttp.ClientTimeout(total=30),
             ) as r:
-                if r.status == 429:
+                if r.status in (403, 429):
                     if self._is_anonymous():
                         try:
                             quota_response = await r.json()
@@ -63,7 +63,7 @@ class Api:
                         if message:
                             raise QuotaExceededError(message)
                         raise QuotaExceededError()
-                    else:
+                    if r.status == 429:
                         return {}
 
                 r.raise_for_status()
@@ -72,6 +72,7 @@ class Api:
     def delete(self, route):
         r = self.__session().delete(self.url(route), headers=self.headers())
 
+        self._handle_quota_response(r)
         r.raise_for_status()
 
         return r.json()
@@ -79,6 +80,7 @@ class Api:
     def get(self, route):
         r = self.__session().get(self.url(route), headers=self.headers())
 
+        self._handle_quota_response(r)
         r.raise_for_status()
 
         return r.json()
@@ -89,6 +91,7 @@ class Api:
     def patch(self, route, json=None):
         r = self.__session().patch(self.url(route), headers=self.headers(), json=json)
 
+        self._handle_quota_response(r)
         r.raise_for_status()
 
         return r.json()
@@ -99,6 +102,7 @@ class Api:
     def post(self, route, json=None):
         r = self.__session().post(self.url(route), headers=self.headers(), json=json)
 
+        self._handle_quota_response(r)
         r.raise_for_status()
 
         return r.json()
@@ -109,14 +113,14 @@ class Api:
     def headers(self):
         headers = {"X-Memori-API-Key": self.__x_api_key}
 
-        api_key = os.environ.get("MEMORI_API_KEY")
+        api_key = self._get_api_key()
         if api_key is not None:
             headers["Authorization"] = f"Bearer {api_key}"
 
         return headers
 
     def _is_anonymous(self):
-        return os.environ.get("MEMORI_API_KEY") is None
+        return not self._get_api_key()
 
     async def __request_async(self, method: str, route: str, json=None):
         url = self.url(route)
@@ -136,6 +140,17 @@ class Api:
                         json=json,
                         timeout=aiohttp.ClientTimeout(total=30),
                     ) as r:
+                        if r.status in (403, 429) and self._is_anonymous():
+                            try:
+                                quota_response = await r.json()
+                                message = quota_response.get("message")
+                            except Exception:
+                                message = None
+
+                            if message:
+                                raise QuotaExceededError(message)
+                            raise QuotaExceededError()
+
                         r.raise_for_status()
                         return await r.json()
             except aiohttp.ClientResponseError as e:
@@ -175,6 +190,27 @@ class Api:
 
     def url(self, route):
         return f"{self.__base}/v1/{route}"
+
+    def _get_api_key(self):
+        return self.config.api_key or os.environ.get("MEMORI_API_KEY")
+
+    def _handle_quota_response(self, response):
+        if response.status_code not in (403, 429):
+            return
+
+        if not self._is_anonymous():
+            return
+
+        message = None
+        try:
+            payload = response.json()
+            message = payload.get("message")
+        except Exception:
+            message = None
+
+        if message:
+            raise QuotaExceededError(message)
+        raise QuotaExceededError()
 
 
 class _ApiRetryRecoverable(Retry):

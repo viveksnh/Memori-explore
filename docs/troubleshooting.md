@@ -369,14 +369,14 @@ mem.config.recall_embeddings_limit = 2000  # Default is 1000
 
 **Error Message:**
 ```
-QuotaExceededError: your IP address is over quota; register for an API key now: https://app.memorilabs.ai/signup
+QuotaExceededError: Quota reached. Run `memori login` to upgrade.
 ```
 
 **Solutions:**
 
-1. Sign up for a free API key at [https://app.memorilabs.ai/signup](https://app.memorilabs.ai/signup).
+1. Run `memori login` to authenticate in your browser.
 
-2. Set your API key:
+2. Or set your API key manually:
 ```bash
 export MEMORI_API_KEY="your-api-key-here"
 ```
@@ -528,7 +528,7 @@ mem = Memori(conn=get_sqlite_connection).llm.register(client, stream=True)
 
 Run the setup command before first use:
 ```bash
-python -m memori setup
+memori setup
 ```
 
 This is a one-time download. Subsequent runs will be fast.
@@ -668,7 +668,7 @@ try:
     mem = Memori(conn=get_sqlite_connection).llm.register(client)
     mem.attribution(entity_id="user-123", process_id="my-app")
 except QuotaExceededError:
-    print("Quota exceeded. Get an API key at https://app.memorilabs.ai/signup")
+    print("Quota reached. Run `memori login` to upgrade.")
 except RuntimeError as e:
     print(f"Configuration error: {e}")
 except Exception as e:

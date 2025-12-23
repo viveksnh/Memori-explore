@@ -19,12 +19,12 @@ class Display:
         return """You already have an active CockroachDB cluster running. To start
   a new one, execute this command first:
 
-    python -m memori cockroachdb cluster delete
+    memori cockroachdb cluster delete
 """
 
     def cluster_was_not_started(self):
         return """You do not have an active CockroachDB cluster running. To start
   a new one, execute this command first:
 
-    python -m memori cockroachdb cluster start
+    memori cockroachdb cluster start
 """

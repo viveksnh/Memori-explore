@@ -28,7 +28,13 @@ For this example, you may also need to install:
 pip install openai
 ```
 
-## Step 2: Set environment variables
+## Step 2: Authenticate Memori (Recommended)
+
+```bash
+memori login
+```
+
+## Step 3: Set environment variables
 
 Set your OpenAI API key in an environment variable:
 
@@ -36,7 +42,7 @@ Set your OpenAI API key in an environment variable:
 export OPENAI_API_KEY="your-api-key-here"
 ```
 
-## Step 3: Run Your First Memori Application
+## Step 4: Run Your First Memori Application
 
 Create a new Python file `quickstart.py` and add the following code:
 
@@ -89,7 +95,7 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content + "\n")
 ```
 
-## Step 4: Run the Application
+## Step 5: Run the Application
 
 Execute your Python file:
 
@@ -97,7 +103,7 @@ Execute your Python file:
 python quickstart.py
 ```
 
-## Step 5: Check the memories created
+## Step 6: Check the memories created
 
 ```bash
 /bin/echo "select * from memori_entity_fact" | /usr/bin/sqlite3 memori.db

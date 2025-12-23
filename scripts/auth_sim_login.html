@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Memori Auth Simulator</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4efe7;
+        --ink: #241c15;
+        --muted: #6b5f54;
+        --panel: #fff8ef;
+        --accent: #d36c1a;
+        --accent-strong: #9a4a13;
+        --border: #e3d2c1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #fff8ef 0%, #f4efe7 50%, #efe7dc 100%);
+        color: var(--ink);
+      }
+
+      main {
+        max-width: 760px;
+        margin: 48px auto;
+        padding: 0 24px 48px;
+      }
+
+      header {
+        margin-bottom: 32px;
+      }
+
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin: 0 0 12px;
+      }
+
+      .lead {
+        font-size: 16px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 14px 30px rgba(36, 28, 21, 0.08);
+      }
+
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 0;
+        border-bottom: 1px dashed #e7dbcf;
+      }
+
+      .row:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+
+      code {
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        font-size: 15px;
+        background: #f2e7da;
+        padding: 6px 10px;
+        border-radius: 10px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-top: 22px;
+      }
+
+      button {
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        font-size: 15px;
+        padding: 12px 22px;
+        border-radius: 999px;
+        cursor: pointer;
+        box-shadow: 0 10px 18px rgba(211, 108, 26, 0.3);
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      button:hover:enabled {
+        transform: translateY(-1px);
+        background: var(--accent-strong);
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .status {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .note {
+        margin-top: 28px;
+        padding: 16px 18px;
+        border-radius: 14px;
+        border: 1px solid #efe0d2;
+        background: #fbf4ea;
+        color: #5f4f43;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          margin: 32px auto;
+        }
+
+        h1 {
+          font-size: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Memori Auth Simulator</p>
+        <h1>Token Flow Activation</h1>
+        <p class="lead">
+          This static page stands in for the Memori signup and verification flow. In production,
+          the backend would receive the token, wait for account creation and verification, then
+          mark the token active so the CLI can finish authentication.
+        </p>
+      </header>
+
+      <section class="panel">
+        <div class="row">
+          <span class="label">Token Flow ID</span>
+          <code id="tokenFlowId">pending</code>
+        </div>
+        <div class="row">
+          <span class="label">Device Code</span>
+          <code id="deviceCode">waiting</code>
+        </div>
+        <div class="row">
+          <span class="label">Loopback Status</span>
+          <span id="loopbackStatus" class="status">waiting for localhost port</span>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button id="activateButton" disabled>Activate token</button>
+        <span id="activateStatus" class="status">Waiting for a token flow id.</span>
+      </div>
+
+      <div class="note">
+        Press "Activate token" after you are done reviewing the details. This simulates the
+        server-side event where the account is created or verified and the token becomes active.
+        The CLI keeps polling until it sees the activation.
+      </div>
+    </main>
+
+    <script>
+      const tokenFlowIdEl = document.getElementById("tokenFlowId");
+      const deviceCodeEl = document.getElementById("deviceCode");
+      const loopbackStatusEl = document.getElementById("loopbackStatus");
+      const activateButton = document.getElementById("activateButton");
+      const activateStatusEl = document.getElementById("activateStatus");
+
+      let tokenFlowId = "";
+
+      const setTokenFlowId = (value) => {
+        tokenFlowId = value || "";
+        tokenFlowIdEl.textContent = tokenFlowId || "pending";
+        activateButton.disabled = !tokenFlowId;
+        if (tokenFlowId) {
+          activateStatusEl.textContent = "Ready to activate the token.";
+        } else {
+          activateStatusEl.textContent = "Waiting for a token flow id.";
+        }
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const queryToken = params.get("token_flow_id");
+      const deviceCode = params.get("code");
+      const localhostPort = params.get("localhost_port");
+
+      if (queryToken) {
+        setTokenFlowId(queryToken);
+      }
+
+      if (deviceCode) {
+        deviceCodeEl.textContent = deviceCode;
+      }
+
+      if (localhostPort) {
+        const loopbackUrl = `http://127.0.0.1:${localhostPort}/`;
+        loopbackStatusEl.textContent = `Querying ${loopbackUrl}`;
+        fetch(loopbackUrl)
+          .then((response) => response.text())
+          .then((text) => {
+            if (text && !tokenFlowId) {
+              setTokenFlowId(text.trim());
+            }
+            loopbackStatusEl.textContent = "Loopback token flow id fetched.";
+          })
+          .catch((error) => {
+            loopbackStatusEl.textContent = `Loopback fetch failed: ${error}`;
+          });
+      } else {
+        loopbackStatusEl.textContent = "No localhost port provided.";
+      }
+
+      activateButton.addEventListener("click", () => {
+        if (!tokenFlowId) {
+          return;
+        }
+        activateButton.disabled = true;
+        activateStatusEl.textContent = "Activating token...";
+
+        fetch("/v1/token-flow/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token_flow_id: tokenFlowId }),
+        })
+          .then(async (response) => {
+            const payload = await response.json().catch(() => ({}));
+            return { ok: response.ok, payload };
+          })
+          .then(({ ok, payload }) => {
+            if (ok) {
+              activateStatusEl.textContent = "Token activated. You can return to the CLI.";
+            } else {
+              activateStatusEl.textContent =
+                payload.error || "Activation failed. Check the auth simulator logs.";
+            }
+            activateButton.disabled = false;
+          })
+          .catch((error) => {
+            activateStatusEl.textContent = `Activation failed: ${error}`;
+            activateButton.disabled = false;
+          });
+      });
+    </script>
+  </body>
+</html>

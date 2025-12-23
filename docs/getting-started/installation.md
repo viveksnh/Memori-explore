@@ -87,13 +87,21 @@ mem = Memori(conn=SessionLocal)
 
 Advanced Augmentation enhances your memories in the background. It's rate limited by IP address without an API key, or you can sign up for increased limits.
 
-### Option 1: Environment Variable
+### Option 1: Browser Login (Recommended)
+
+```bash
+memori login
+```
+
+This opens your browser and stores your key securely in your system keychain.
+
+### Option 2: Environment Variable
 
 ```bash
 export MEMORI_API_KEY="your-api-key-here"
 ```
 
-### Option 2: .env File
+### Option 3: .env File
 
 Create `.env` file in your project:
 
@@ -101,16 +109,10 @@ Create `.env` file in your project:
 MEMORI_API_KEY=your-api-key-here
 ```
 
-### Option 3: Sign Up via CLI
-
-```bash
-python3 -m memori sign-up your-email@example.com
-```
-
 ### Check Your Quota
 
 ```bash
-python3 -m memori quota
+memori quota
 ```
 
 Or you can visit [https://memorilabs.ai/](https://memorilabs.ai/) to manage your account.

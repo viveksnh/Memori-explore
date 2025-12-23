@@ -77,7 +77,7 @@ Memori is built with a modular, enterprise-grade architecture focused on simplic
 - Generates embeddings for semantic search
 - Identifies preferences, skills, attributes
 - Runs asynchronously with no latency impact
-- Upgrade via MEMORI_API_KEY (free tier available)
+- Upgrade via `memori login` or MEMORI_API_KEY (free tier available)
 
 ## Data Flow
 

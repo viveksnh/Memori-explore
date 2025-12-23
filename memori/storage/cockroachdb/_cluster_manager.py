@@ -169,4 +169,4 @@ class ClusterManager:
         return os.path.isfile(self.files.cluster_id())
 
     def usage(self):
-        print("usage: python -m memori cockroachdb cluster <start | claim | delete>")
+        print("usage: memori cockroachdb cluster <start | claim | delete>")

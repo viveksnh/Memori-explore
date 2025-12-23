@@ -9,13 +9,13 @@ The CLI allows you to manage your integration with Memori and perform actions su
 To use the Memori CLI, execute the following from the command line:
 
 ```bash
-python -m memori
+memori
 ```
 
-This will display a menu of the available options. To execute a particular command, just provide the option and any params:
+This will display help with the available commands. To execute a particular command, just provide the option and any params:
 
 ```bash
-python -m memori <option> [params]
+memori <command> [params]
 ```
 
 The menu provides a column indicating if a particular option requires additional parameters.
@@ -23,7 +23,7 @@ The menu provides a column indicating if a particular option requires additional
 ## CockroachDB
 
 ```bash
-usage: python -m memori cockroachdb cluster <start | claim | delete>
+usage: memori cockroachdb cluster <start | claim | delete>
 ```
 
 Parameters:
@@ -36,7 +36,7 @@ If you do not have database infrastructure or want to provision serverless, clou
 ## Quota
 
 ```bash
-usage: python -m memori quota
+usage: memori quota
 ```
 
 Displays your available quota.
@@ -44,7 +44,7 @@ Displays your available quota.
 ## Set Up
 
 ```bash
-usage: python -m memori setup
+usage: memori setup
 ```
 
 Executes any necessary set up steps to prepare your environment for using Memori. Note, executing this command is not necessary but will cache any data you need to make sure real time execution of Memori is faster.
@@ -52,7 +52,31 @@ Executes any necessary set up steps to prepare your environment for using Memori
 ## Sign Up
 
 ```bash
-usage: python -m memori sign-up <email_address>
+usage: memori sign-up <email_address>
 ```
 
 Provides a convenience for signing up for a Memori API key.
+
+## Login
+
+```bash
+usage: memori login
+```
+
+Opens your browser and stores your credentials in your system keychain.
+
+## Status
+
+```bash
+usage: memori status
+```
+
+Shows whether you're authenticated and which credential source is active.
+
+## Logout
+
+```bash
+usage: memori logout
+```
+
+Removes stored credentials from your system keychain.

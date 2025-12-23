@@ -47,6 +47,12 @@ Install Memori:
 pip install memori
 ```
 
+Authenticate (recommended):
+
+```bash
+memori login
+```
+
 ## What's New In v3?
 
 - Significant performance improvements using Advanced Augmentation.
@@ -104,7 +110,7 @@ mem.set_session(session_id)
 To make sure everything is installed in the most efficient manner, we suggest you execute the following once:
 
 ```bash
-python -m memori setup
+memori setup
 ```
 
 This step is not necessary but will prep your environment for faster execution. If you do not perform this step, it will be executed the first time Memori is run which will cause the first execution (and only the first one) to be a little slower.
@@ -236,15 +242,15 @@ Memories are tracked at several different levels:
 
 Memori knows who your user is, what tasks your agent handles and creates unparalleled context between the two. Augmentation occurs in the background incurring no latency.
 
-By default, Memori Advanced Augmentation is available without an account but rate limited. When you need increased limits, [sign up for Memori Advanced Augmentation](https://app.memorilabs.ai/signup) or execute the following:
+By default, Memori Advanced Augmentation is available without an account but rate limited. When you need increased limits, authenticate at [https://memorilabs.ai/login](https://memorilabs.ai/login) or execute the following:
 
 ```bash
-python -m memori sign-up <email_address>
+memori login
 ```
 
 Memori Advanced Augmentation is always free for developers!
 
-Once you've obtained an API key, simply set the following environment variable:
+Memori stores your key securely in your system keychain. You can also set an API key manually if needed:
 
 ```bash
 export MEMORI_API_KEY=[api_key]
@@ -255,10 +261,10 @@ export MEMORI_API_KEY=[api_key]
 At any time, you can check your quota by executing the following:
 
 ```bash
-python -m memori quota
+memori quota
 ```
 
-Or by checking your account at [https://memorilabs.ai/](https://memorilabs.ai/). If you have reached your IP address quota, sign up and get an API key for increased limits.
+Or by checking your account at [https://memorilabs.ai/](https://memorilabs.ai/). If you have reached your IP address quota, log in to get an API key for increased limits.
 
 If your API key exceeds its quota limits we will email you and let you know.
 
@@ -267,10 +273,10 @@ If your API key exceeds its quota limits we will email you and let you know.
 To use the Memori CLI, execute the following from the command line:
 
 ```bash
-python -m memori
+memori
 ```
 
-This will display a menu of the available options. For more information about what you can do with the Memori CLI, please reference [Command Line Interface](https://github.com/MemoriLabs/Memori/blob/main/docs/cli.md).
+This will display help with the available commands. For more information about what you can do with the Memori CLI, please reference [Command Line Interface](https://github.com/MemoriLabs/Memori/blob/main/docs/cli.md).
 
 ## Contributing
 

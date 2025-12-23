@@ -467,8 +467,7 @@ class TestApiQuotaEnforcement:
             with pytest.raises(QuotaExceededError) as exc_info:
                 await api.augmentation_async({"test": "payload"})
             assert (
-                "your IP address is over quota; register for an API key now: "
-                + "https://app.memorilabs.ai/signup"
+                "Quota reached. Run `memori login` to upgrade."
                 in str(exc_info.value)
             )
 
@@ -495,8 +494,7 @@ class TestApiQuotaEnforcement:
             with pytest.raises(QuotaExceededError) as exc_info:
                 await api.augmentation_async({"test": "payload"})
             assert (
-                "your IP address is over quota; register for an API key now: "
-                + "https://app.memorilabs.ai/signup"
+                "Quota reached. Run `memori login` to upgrade."
                 in str(exc_info.value)
             )
 

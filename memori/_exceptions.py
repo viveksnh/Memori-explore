@@ -16,8 +16,7 @@ class QuotaExceededError(Exception):
     def __init__(
         self,
         message=(
-            "your IP address is over quota; register for an API key now: "
-            + "https://app.memorilabs.ai/signup"
+            "Quota reached. Run `memori login` to upgrade."
         ),
     ):
         self.message = message

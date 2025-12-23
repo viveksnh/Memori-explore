@@ -9,6 +9,7 @@ r"""
 """
 
 import os
+import sys
 from collections.abc import Callable
 from typing import Any
 from uuid import uuid4
@@ -16,6 +17,7 @@ from uuid import uuid4
 import psycopg
 
 from memori._config import Config
+from memori._auth import get_api_key
 from memori._exceptions import (
     QuotaExceededError,
     warn_if_legacy_memorisdk_installed,
@@ -34,6 +36,8 @@ from memori.storage import Manager as StorageManager
 __all__ = ["Memori", "QuotaExceededError"]
 
 warn_if_legacy_memorisdk_installed()
+
+_AUTH_NUDGE_SHOWN = False
 
 
 class LlmRegistry:
@@ -71,9 +75,11 @@ class LlmRegistry:
 class Memori:
     def __init__(self, conn: Callable[[], Any] | Any | None = None):
         self.config = Config()
-        self.config.api_key = os.environ.get("MEMORI_API_KEY", None)
+        self.config.api_key = get_api_key()
         self.config.enterprise = os.environ.get("MEMORI_ENTERPRISE", "0") == "1"
         self.config.session_id = uuid4()
+
+        self._check_auth()
 
         if conn is None:
             conn = self._get_default_connection()
@@ -90,6 +96,42 @@ class Memori:
         self.openai = LlmProviderOpenAi(self)
         self.pydantic_ai = LlmProviderPydanticAi(self)
         self.xai = LlmProviderXAi(self)
+
+    def _check_auth(self):
+        global _AUTH_NUDGE_SHOWN
+        if _AUTH_NUDGE_SHOWN:
+            return
+
+        if self.config.api_key:
+            return
+
+        if os.environ.get("MEMORI_DISABLE_NUDGE") == "1":
+            return
+
+        if not (sys.stdout.isatty() or sys.stderr.isatty()):
+            return
+
+        _AUTH_NUDGE_SHOWN = True
+
+        message = (
+            "Memori is running without an API key.\n"
+            "Run `memori login` to unlock higher limits and sync your account."
+        )
+
+        try:
+            from rich.console import Console
+            from rich.panel import Panel
+            from rich.text import Text
+        except Exception:
+            print(message, file=sys.stderr)
+            return
+
+        console = Console(stderr=True)
+        text = Text("Memori is running without an API key.\n", style="bold yellow")
+        text.append(
+            "Run `memori login` to unlock higher limits and sync your account."
+        )
+        console.print(Panel(text, title="Memori login", border_style="yellow"))
 
     def _get_default_connection(self) -> Callable[[], Any]:
         connection_string = os.environ.get("MEMORI_COCKROACHDB_CONNECTION_STRING")

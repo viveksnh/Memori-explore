@@ -11,7 +11,7 @@ Learn the core concepts of Memori with practical examples.
 To make sure everything is installed in the most efficient manner, we suggest you execute the following one time, after you install Memori:
 
 ```bash
-python -m memori setup
+memori setup
 ```
 
 This step is not necessary but will prep your environment for faster execution. If you do not perform this step, it will be executed the first time Memori is run which will cause the first execution (and only the first one) to be a little slower.

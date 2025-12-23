@@ -252,10 +252,10 @@ Memori provides CLI commands for managing your account and quota:
 
 ```bash
 # Check your API quota
-python3 -m memori quota
+memori quota
 
-# Sign up for Memori Advanced Augmentation
-python3 -m memori sign-up <email_address>
+# Authenticate for Memori Advanced Augmentation
+memori login
 ```
 
 These commands help you:
